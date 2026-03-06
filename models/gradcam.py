@@ -48,24 +48,28 @@ class ExplainableModel:
         Returns:
             heatmap_overlay (np.ndarray): RGB Image with CAM overlaid.
         """
-        # Target index 0 (Assuming 0 is the required binary target we want gradients for)
-        # Because we output 1 logit, the class index is 0.
         targets = [ClassifierOutputTarget(0)]
-        
-        # Generate the raw heatmap (1, H, W)
         grayscale_cam = self.cam(input_tensor=input_tensor, targets=targets)
         grayscale_cam = grayscale_cam[0, :]
         
         if original_rgb_image is not None:
-            # Resize original image to match tensor dims if needed
             if original_rgb_image.shape[:2] != (input_tensor.shape[2], input_tensor.shape[3]):
                 original_rgb_image = cv2.resize(original_rgb_image, (input_tensor.shape[3], input_tensor.shape[2]))
-                
-            # Ensure float32 and range [0, 1] for show_cam_on_image
             if original_rgb_image.dtype == np.uint8:
                 original_rgb_image = original_rgb_image.astype(np.float32) / 255.0
-                
             visualization = show_cam_on_image(original_rgb_image, grayscale_cam, use_rgb=True)
             return visualization
         else:
             return grayscale_cam
+
+    def generate_heatmap_only(self, input_tensor, target_size=None):
+        """Returns heatmap with colormap applied (no overlay) for display."""
+        targets = [ClassifierOutputTarget(0)]
+        grayscale_cam = self.cam(input_tensor=input_tensor, targets=targets)
+        grayscale_cam = grayscale_cam[0, :]
+        heatmap_uint8 = np.uint8(255 * grayscale_cam)
+        heatmap_bgr = cv2.applyColorMap(heatmap_uint8, cv2.COLORMAP_JET)
+        heatmap_rgb = cv2.cvtColor(heatmap_bgr, cv2.COLOR_BGR2RGB)
+        if target_size:
+            heatmap_rgb = cv2.resize(heatmap_rgb, target_size)
+        return heatmap_rgb

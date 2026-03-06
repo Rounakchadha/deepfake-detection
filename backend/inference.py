@@ -84,19 +84,24 @@ class DeepfakeDetector:
         
         # 6. Explainability (Grad-CAM)
         heatmap_base64 = None
+        heatmap_only_base64 = None
         if self.explainer:
             try:
                 img_normalized = img_rgb.astype(np.float32) / 255.0
                 heatmap_img = self.explainer.generate_heatmap(
-                    input_tensor=input_tensor.cpu(), 
+                    input_tensor=input_tensor,
                     original_rgb_image=img_normalized
                 )
                 heatmap_bgr = cv2.cvtColor(heatmap_img, cv2.COLOR_RGB2BGR)
                 _, buffer = cv2.imencode('.jpg', heatmap_bgr)
                 heatmap_base64 = base64.b64encode(buffer).decode('utf-8')
+                heatmap_only = self.explainer.generate_heatmap_only(input_tensor)
+                _, buf2 = cv2.imencode('.jpg', cv2.cvtColor(heatmap_only, cv2.COLOR_RGB2BGR))
+                heatmap_only_base64 = base64.b64encode(buf2).decode('utf-8')
             except Exception as e:
                 print(f"Grad-CAM generation failed: {e}")
                 heatmap_base64 = None
+                heatmap_only_base64 = None
 
         return {
             "prediction": pred_label,
@@ -104,6 +109,7 @@ class DeepfakeDetector:
             "fake_probability": round(final_fake_prob, 4),
             "primary_fake_probability": round(efficientnet_prob, 4),
             "heatmap_base64": heatmap_base64,
+            "heatmap_only_base64": heatmap_only_base64,
             "ensemble_used": ensemble_result["ensemble_used"],
             "ensemble_note": ensemble_result.get("note", ""),
             "hf_result": ensemble_result.get("hf_result"),
