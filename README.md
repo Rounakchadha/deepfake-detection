@@ -41,7 +41,15 @@ uvicorn backend.api:app --reload --port 8000
 ```
 *API docs available at: http://localhost:8000/docs*
 
-**2. Start the Frontend (Streamlit)**
+**2. Start the Frontend (Modern React)**
+```bash
+cd frontend-react
+npm install
+npm run dev
+```
+*Interface available at: http://localhost:3000*
+
+**3. Alternative Frontend (Streamlit)**
 ```bash
 streamlit run frontend/app.py
 ```
