@@ -408,44 +408,51 @@ export default function Detect() {
                     </table>
                   </div>
 
-                  {/* Explainable AI Textual Insights */}
-                  {result && (
-                    <div
-                      className="card"
-                      style={{
-                        border: '1px solid var(--accent)',
-                        background: 'linear-gradient(to bottom right, rgba(0, 112, 243, 0.08), rgba(0, 0, 0, 0.2))',
-                        boxShadow: '0 0 20px rgba(0, 112, 243, 0.15)',
-                        position: 'relative',
-                        overflow: 'hidden',
-                        padding: '1.5rem',
-                        marginTop: '1.5rem'
-                      }}
-                    >
-                      <div style={{ position: 'absolute', top: 0, left: 0, width: '4px', height: '100%', background: 'var(--accent)', boxShadow: '0 0 10px var(--accent)' }} />
-
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1rem', borderBottom: '1px solid rgba(0, 112, 243, 0.2)', paddingBottom: '0.75rem' }}>
-                        <Bot size={20} color="var(--accent)" />
-                        <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--accent)', letterSpacing: '0.5px' }}>Explainable AI (XAI) Engine</div>
-                        <Sparkles size={16} color="var(--accent)" style={{ marginLeft: 'auto', opacity: 0.8 }} />
-                      </div>
-
-                      <div style={{ fontSize: '0.88rem', color: 'var(--text)', lineHeight: 1.6, fontFamily: 'monospace' }}>
-                        <div style={{ marginBottom: '0.75rem', color: 'var(--accent)', opacity: 0.7, fontSize: '0.8rem' }}>&gt; Generating narrative analysis...</div>
-                        {isFake ? (
-                          <TypewriterText text={`[DETECTED: DEEPFAKE]\n\nAnalysis: The neural network detected significant spatial anomalies consistent with AI generation. High-frequency noise patterns detected in the background. Inconsistent lighting and blending boundaries around primary facial features.\n\n${result.heatmap_base64 ? '>> Gradient Activation Mapping (Grad-CAM) confirms strong localized focus on unnatural textures.' : ''}`} speed={15} />
-                        ) : (
-                          <TypewriterText text={`[DETECTED: AUTHENTIC]\n\nAnalysis: The image exhibits natural spatial frequencies and consistent lighting logic. No obvious blending artifacts detected around facial contours. Background noise distribution is consistent with natural camera sensors.`} speed={15} />
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  <button className="btn btn-ghost" style={{ width: '100%' }} onClick={onReset}>🔄 Analyse Another</button>
+                  <button className="btn btn-ghost" style={{ width: '100%', marginTop: '1rem' }} onClick={onReset}>🔄 Analyse Another</button>
                 </>
               )}
             </div>
           </div>
+
+          {/* Explainable AI Textual Insights (FULL WIDTH) */}
+          {result && (
+            <div
+              className="card"
+              style={{
+                border: '1px solid var(--accent)',
+                background: 'linear-gradient(to bottom right, rgba(0, 112, 243, 0.08), rgba(0, 0, 0, 0.2))',
+                boxShadow: '0 0 20px rgba(0, 112, 243, 0.15)',
+                position: 'relative',
+                overflow: 'hidden',
+                padding: '1.5rem',
+                marginTop: '1.5rem',
+                gridColumn: '1 / -1' // Guarantee full width if in a grid context
+              }}
+            >
+              <div style={{ position: 'absolute', top: 0, left: 0, width: '4px', height: '100%', background: 'var(--accent)', boxShadow: '0 0 10px var(--accent)' }} />
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1rem', borderBottom: '1px solid rgba(0, 112, 243, 0.2)', paddingBottom: '0.75rem' }}>
+                <Bot size={20} color="var(--accent)" />
+                <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--accent)', letterSpacing: '0.5px' }}>Explainable AI (XAI) Engine</div>
+                <Sparkles size={16} color="var(--accent)" style={{ marginLeft: 'auto', opacity: 0.8 }} />
+              </div>
+
+              <div style={{
+                fontSize: '0.95rem',
+                color: 'var(--text)',
+                lineHeight: 1.8,
+                fontFamily: 'monospace',
+                whiteSpace: 'pre-wrap'
+              }}>
+                <div style={{ marginBottom: '0.75rem', color: 'var(--accent)', opacity: 0.7, fontSize: '0.8rem' }}>&gt; Generating narrative analysis...</div>
+                {isFake ? (
+                  <TypewriterText text={`[DETECTED: DEEPFAKE]\n\n• Analysis: The neural network detected significant spatial anomalies consistent with AI generation.\n• High-frequency noise patterns detected in the background.\n• Inconsistent lighting and blending boundaries around primary facial features.\n${result.heatmap_base64 ? '\n>> Gradient Activation Mapping (Grad-CAM) confirms strong localized focus on unnatural textures.' : ''}`} speed={15} />
+                ) : (
+                  <TypewriterText text={`[DETECTED: AUTHENTIC]\n\n• Analysis: The image exhibits natural spatial frequencies and consistent lighting logic.\n• No obvious blending artifacts detected around facial contours.\n• Background noise distribution is consistent with natural camera sensors.`} speed={15} />
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Educational panels */}
           <div style={{ marginTop: '2.5rem' }}>
