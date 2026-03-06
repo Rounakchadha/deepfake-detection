@@ -372,3 +372,13 @@ th { background: var(--bg3); color: var(--muted); font-weight: 600; letter-spaci
 td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); color: var(--text); }
 tr:last-child td { border-bottom: none; }
 tr:hover td { background: rgba(124,58,237,0.04); }
+
+/* AI Animations */
+@keyframes blink {
+  0%, 49% { border-right-color: transparent; }
+  50%, 100% { border-right-color: var(--accent); }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.2); }
+}
