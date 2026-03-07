@@ -172,6 +172,7 @@ export default function Detect() {
   const [error, setError] = useState(null)
   const [view, setView] = useState('original')
   const [threshold, setThreshold] = useState(0.5)
+  const [feedback, setFeedback] = useState(null)
   const inputRef = useRef()
 
   const handleFile = useCallback((f) => {
@@ -291,6 +292,7 @@ export default function Detect() {
     setResult(null)
     setError(null)
     setView('original')
+    setFeedback(null)
     if (inputRef.current) inputRef.current.value = ''
   }
 
@@ -561,6 +563,44 @@ export default function Detect() {
                   <span style={{ fontSize: '0.7rem', opacity: 0.8 }}>TN</span>
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* User Feedback Loop - Added underneath Results & Metrics */}
+          {result && (
+            <div className="card" style={{ marginTop: '1.5rem', padding: '1.5rem', width: '100%', textAlign: 'center', background: 'var(--bg)' }}>
+              <div style={{ fontWeight: 600, fontSize: '1rem', marginBottom: '0.5rem' }}>Help Improve This Model</div>
+
+              {!feedback ? (
+                <>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--muted)', marginBottom: '1rem' }}>
+                    Do you agree with the model's prediction of <strong>{isFake ? 'DEEPFAKE' : 'REAL'}</strong>?
+                  </p>
+                  <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                    <button
+                      className="btn"
+                      style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.4)', color: 'var(--green)' }}
+                      onClick={() => setFeedback('correct')}
+                    >
+                      👍 Prediction is Correct
+                    </button>
+                    <button
+                      className="btn"
+                      style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.4)', color: 'var(--red)' }}
+                      onClick={() => setFeedback('incorrect')}
+                    >
+                      👎 Prediction is Incorrect
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div style={{ padding: '1rem', background: 'var(--bg-card)', borderRadius: '8px', border: '1px solid var(--accent)', color: 'var(--accent)' }}>
+                  <div style={{ fontWeight: 700, marginBottom: '0.3rem' }}>✓ Thank you for your feedback!</div>
+                  <div style={{ fontSize: '0.8rem', opacity: 0.8 }}>
+                    Your response has been recorded. We use community feedback to continuously retrain and improve the neural network's accuracy in the backend.
+                  </div>
+                </div>
+              )}
             </div>
           )}          {/* Educational panels */}
           <div style={{ marginTop: '2.5rem' }}>
