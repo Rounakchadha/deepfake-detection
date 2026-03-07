@@ -1,0 +1,55 @@
+INFO:     Started server process [73427]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+Initializing Deepfake Detector Pipeline...
+Initializing Model: efficientnet_b0
+Loading weights from checkpoints/best_model.pth onto mps...
+Pipeline ready.
+INFO:     127.0.0.1:62919 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62926 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62929 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62934 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62938 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62943 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62946 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62955 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62965 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62981 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62986 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62989 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62997 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63000 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63003 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63014 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63017 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63024 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63035 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63038 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63045 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63048 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63064 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63067 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63155 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63189 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63198 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63207 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63218 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63223 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63230 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63239 - "GET / HTTP/1.1" 200 OK
+'(ReadTimeoutError("HTTPSConnectionPool(host='huggingface.co', port=443): Read timed out. (read timeout=10)"), '(Request ID: 1e4488fe-8d40-4ec3-8305-2efbcae0d7ba)')' thrown while requesting HEAD https://huggingface.co/prithivMLmods/Deep-Fake-Detector-v2-Model/resolve/main/preprocessor_config.json
+Retrying in 1s [Retry 1/5].
+'(ReadTimeoutError("HTTPSConnectionPool(host='huggingface.co', port=443): Read timed out. (read timeout=10)"), '(Request ID: 36c741f2-e1eb-4f9c-a7b7-b1fd22dfd5a8)')' thrown while requesting HEAD https://huggingface.co/prithivMLmods/Deep-Fake-Detector-v2-Model/resolve/main/config.json
+Retrying in 1s [Retry 1/5].
+Grad-CAM generation failed: axis 2 is out of bounds for array of dimension 0
+INFO:     127.0.0.1:63244 - "POST /predict/image HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63257 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63263 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63266 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63279 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63284 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63295 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63299 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63302 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63310 - "GET / HTTP/1.1" 200 OK

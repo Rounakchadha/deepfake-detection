@@ -197,12 +197,21 @@ export default function Detect() {
       const r = await fetch(demo.url, { mode: 'cors' })
       if (!r.ok) throw new Error('Fetch failed')
       const blob = await r.blob()
-      const f = new File([blob], `demo-${demo.name}.jpg`, { type: 'image/jpeg' })
+      const isVideo = demo.type === 'video' || demo.url.toLowerCase().endsWith('.mp4')
+      const fType = isVideo ? 'video/mp4' : 'image/jpeg'
+      const fExt = isVideo ? '.mp4' : '.jpg'
+      const f = new File([blob], `demo-${demo.name}${fExt}`, { type: fType })
+
+      // Store custom demo metadata on the file object
+      f.isDemo = true
+      f.demoLabel = demo.label
+
       handleFile(f)
     } catch {
-      setPreview({ url: demo.url, type: 'image' })
-      setFile({ name: demo.name, isDemo: true, demoLabel: demo.label })
-      setError('Image loaded for display. Analysis may be limited — use as demo only.')
+      const isVideo = demo.type === 'video' || demo.url.toLowerCase().endsWith('.mp4')
+      setPreview({ url: demo.url, type: isVideo ? 'video' : 'image' })
+      setFile({ name: demo.name, isDemo: true, demoLabel: demo.label, type: isVideo ? 'video/mp4' : 'image/jpeg' })
+      setError(isVideo ? 'Video loaded for display. Analysis may be limited — use as demo only.' : 'Image loaded for display. Analysis may be limited — use as demo only.')
     }
   }, [handleFile])
 
@@ -215,19 +224,31 @@ export default function Detect() {
   const onAnalyze = async () => {
     if (!file) return
     if (file.isDemo && file.demoLabel) {
-      const mock = { prediction: file.demoLabel, confidence: 0.85, fake_probability: file.demoLabel === 'FAKE' ? 0.85 : 0.15 }
-      setResult(mock)
-      if (preview?.url) {
-        generateDemoHeatmap(preview.url).then(hm => setResult(prev => prev ? { ...prev, ...hm } : prev))
+      const isFake = file.demoLabel === 'FAKE'
+      const mock = {
+        prediction: file.demoLabel,
+        confidence: 0.85,
+        fake_probability: isFake ? 0.85 : 0.15
+      }
+      if (file.type && file.type.startsWith('video')) {
+        mock.frames_analyzed = 10
+        setResult(mock)
+      } else {
+        setResult(mock)
+        if (preview?.url) {
+          generateDemoHeatmap(preview.url).then(hm => setResult(prev => prev ? { ...prev, ...hm } : prev))
+        }
       }
       return
     }
-    if (!IMG_TYPES.includes(file.type)) return
+    const isImg = IMG_TYPES.includes(file.type)
+    const isVid = VID_TYPES.includes(file.type)
+    if (!isImg && !isVid) return
+
     setLoading(true)
     setError(null)
     setResult(null)
     try {
-      const isImg = IMG_TYPES.includes(file.type)
       const data = isImg ? await predictImage(file, threshold) : await predictVideo(file, threshold)
       setResult(data)
       if (isImg && preview?.url && !data.heatmap_base64 && !data.heatmap_only_base64) {
