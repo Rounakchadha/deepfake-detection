@@ -38,7 +38,7 @@ export default function Home() {
 
             <div className="stats-row">
                 {[
-                    ['98%+', 'Detection Accuracy'],
+                    ['95%+', 'Detection Accuracy'],
                     ['<2s', 'Inference Time'],
                     ['3', 'Datasets Trained'],
                     ['Grad-CAM', 'Explainability'],
