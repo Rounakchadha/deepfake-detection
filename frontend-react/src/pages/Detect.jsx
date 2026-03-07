@@ -403,105 +403,20 @@ export default function Detect() {
                 </div>
               )}
 
-              {/* Explainable AI Textual Insights (Left Column) */}
-              {result && (
-                <div
-                  className="card"
-                  style={{
-                    border: '1px solid var(--accent)',
-                    background: 'linear-gradient(to bottom right, rgba(0, 112, 243, 0.08), rgba(0, 0, 0, 0.2))',
-                    boxShadow: '0 0 20px rgba(0, 112, 243, 0.15)',
-                    position: 'relative',
-                    overflow: 'hidden',
-                    padding: '1.5rem',
-                    marginTop: '1.5rem',
-                  }}
-                >
-                  <div style={{ position: 'absolute', top: 0, left: 0, width: '4px', height: '100%', background: 'var(--accent)', boxShadow: '0 0 10px var(--accent)' }} />
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1rem', borderBottom: '1px solid rgba(0, 112, 243, 0.2)', paddingBottom: '0.75rem' }}>
-                    <Bot size={20} color="var(--accent)" />
-                    <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--accent)', letterSpacing: '0.5px' }}>Explainable AI (XAI) Engine</div>
-                    <Sparkles size={16} color="var(--accent)" style={{ marginLeft: 'auto', opacity: 0.8 }} />
-                  </div>
-
-                  <div style={{
-                    fontSize: '0.95rem',
-                    color: 'var(--text)',
-                    lineHeight: 1.8,
-                    fontFamily: 'monospace',
-                    whiteSpace: 'pre-wrap'
-                  }}>
-                    <div style={{ marginBottom: '0.75rem', color: 'var(--accent)', opacity: 0.7, fontSize: '0.8rem' }}>&gt; Generating narrative analysis...</div>
-                    {isFake ? (
-                      <TypewriterText text={`[DETECTED: DEEPFAKE]\n\n• Analysis: The neural network detected significant spatial anomalies consistent with AI generation.\n• High-frequency noise patterns detected in the background.\n• Inconsistent lighting and blending boundaries around primary facial features.\n${result.heatmap_base64 ? '\n>> Gradient Activation Mapping (Grad-CAM) confirms strong localized focus on unnatural textures.' : ''}`} speed={15} />
-                    ) : (
-                      <TypewriterText text={`[DETECTED: AUTHENTIC]\n\n• Analysis: The image exhibits natural spatial frequencies and consistent lighting logic.\n• No obvious blending artifacts detected around facial contours.\n• Background noise distribution is consistent with natural camera sensors.`} speed={15} />
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Model Performance Metrics Card (Bigger, below XAI) */}
-              {result && (
-                <div className="card" style={{ padding: '1.4rem', marginTop: '1.5rem' }}>
-                  <div style={{ fontWeight: 600, fontSize: '1.05rem', marginBottom: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <span>📊</span> Model Performance Metrics
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
-                    {[
-                      { label: 'Accuracy', value: '95.8%' },
-                      { label: 'Precision', value: '96.2%' },
-                      { label: 'Recall', value: '95.5%' },
-                      { label: 'F1 Score', value: '95.8%' },
-                      { label: 'ROC-AUC', value: '0.985' },
-                    ].map((m, i) => (
-                      <div key={i} style={{ background: 'var(--bg)', padding: '0.8rem', borderRadius: '8px', textAlign: 'center', border: '1px solid var(--border)' }}>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.4rem' }}>{m.label}</div>
-                        <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text)' }}>{m.value}</div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div style={{ fontSize: '0.85rem', color: 'var(--muted)', marginBottom: '0.6rem', fontWeight: 600, textTransform: 'uppercase' }}>Confusion Matrix (Test Set)</div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '50px 1fr 1fr', gridTemplateRows: '25px 1fr 1fr', gap: '4px', fontSize: '0.85rem', textAlign: 'center' }}>
-                    <div />
-                    <div style={{ color: 'var(--muted)', alignSelf: 'end' }}>Pred F</div>
-                    <div style={{ color: 'var(--muted)', alignSelf: 'end' }}>Pred R</div>
-                    <div style={{ color: 'var(--muted)', alignSelf: 'center', justifySelf: 'end', paddingRight: '8px' }}>True F</div>
-                    <div style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '1rem', borderRadius: '6px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                      <span style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--green)' }}>1420</span>
-                      <span style={{ fontSize: '0.7rem', opacity: 0.8 }}>TP</span>
-                    </div>
-                    <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '1rem', borderRadius: '6px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                      <span style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--red)' }}>69</span>
-                      <span style={{ fontSize: '0.7rem', opacity: 0.8 }}>FN</span>
-                    </div>
-                    <div style={{ color: 'var(--muted)', alignSelf: 'center', justifySelf: 'end', paddingRight: '8px' }}>True R</div>
-                    <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '1rem', borderRadius: '6px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                      <span style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--red)' }}>56</span>
-                      <span style={{ fontSize: '0.7rem', opacity: 0.8 }}>FP</span>
-                    </div>
-                    <div style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '1rem', borderRadius: '6px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                      <span style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--green)' }}>1455</span>
-                      <span style={{ fontSize: '0.7rem', opacity: 0.8 }}>TN</span>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <div className="card">
-                <div style={{ fontWeight: 600, marginBottom: '0.75rem', fontSize: '0.9rem' }}>⚙️ Detection Threshold</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              <div className="card" style={{ padding: '0.7rem 0.9rem' }}>
+                <div style={{ fontWeight: 600, marginBottom: '0.5rem', fontSize: '0.9rem' }}>⚙️ Detection Threshold</div>
                 <input type="range" min="0.3" max="0.7" step="0.05" value={threshold} onChange={e => setThreshold(parseFloat(e.target.value))} style={{ width: '100%', accentColor: 'var(--accent)' }} />
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.3rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--muted)', marginTop: '0.2rem' }}>
                   <span>0.3 (Liberal)</span><span style={{ color: 'var(--accent2)', fontWeight: 600 }}>{threshold}</span><span>0.7 (Strict)</span>
                 </div>
               </div>
 
               {!result && !loading && (
-                <button className="btn btn-primary" style={{ width: '100%', padding: '1rem' }} onClick={onAnalyze}>🚀 Analyse Now</button>
+                <button className="btn btn-primary" style={{ width: '100%', padding: '0.8rem' }} onClick={onAnalyze}>🚀 Analyse Now</button>
               )}
 
               {loading && (
@@ -544,8 +459,8 @@ export default function Detect() {
                     <div className="alert alert-info">🤗 {result.ensemble_note}</div>
                   )}
 
-                  <div className="card" style={{ fontSize: '0.82rem' }}>
-                    <div style={{ fontWeight: 600, marginBottom: '0.75rem' }}>📋 Details</div>
+                  <div className="card" style={{ fontSize: '0.82rem', padding: '0.8rem 1rem' }}>
+                    <div style={{ fontWeight: 600, marginBottom: '0.5rem' }}>📋 Details</div>
                     <table>
                       <tbody>
                         {[['Prediction', result.prediction], ['Confidence', `${conf}%`], ['Fake Probability', `${fakeProb}%`], ['Grad-CAM', hasHeatmap ? 'Available' : 'Not available'], ...(result.frames_analyzed ? [['Frames', result.frames_analyzed]] : [])].map(([k, v]) => (
@@ -555,15 +470,99 @@ export default function Detect() {
                     </table>
                   </div>
 
-                  <button className="btn btn-ghost" style={{ width: '100%', marginTop: '1rem' }} onClick={onReset}>🔄 Analyse Another</button>
+                  <button className="btn btn-ghost" style={{ width: '100%', marginTop: '0.5rem', padding: '0.6rem' }} onClick={onReset}>🔄 Analyse Another</button>
                 </>
               )}
             </div>
           </div>
 
+          {/* Explainable AI Textual Insights (FULL WIDTH) */}
+          {result && (
+            <div
+              className="card"
+              style={{
+                border: '1px solid var(--accent)',
+                background: 'linear-gradient(to bottom right, rgba(0, 112, 243, 0.08), rgba(0, 0, 0, 0.2))',
+                boxShadow: '0 0 20px rgba(0, 112, 243, 0.15)',
+                position: 'relative',
+                overflow: 'hidden',
+                padding: '1.5rem',
+                marginTop: '1.5rem',
+                width: '100%'
+              }}
+            >
+              <div style={{ position: 'absolute', top: 0, left: 0, width: '4px', height: '100%', background: 'var(--accent)', boxShadow: '0 0 10px var(--accent)' }} />
 
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1rem', borderBottom: '1px solid rgba(0, 112, 243, 0.2)', paddingBottom: '0.75rem' }}>
+                <Bot size={20} color="var(--accent)" />
+                <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--accent)', letterSpacing: '0.5px' }}>Explainable AI (XAI) Engine</div>
+                <Sparkles size={16} color="var(--accent)" style={{ marginLeft: 'auto', opacity: 0.8 }} />
+              </div>
 
-          {/* Educational panels */}
+              <div style={{
+                fontSize: '0.95rem',
+                color: 'var(--text)',
+                lineHeight: 1.8,
+                fontFamily: 'monospace',
+                whiteSpace: 'pre-wrap'
+              }}>
+                <div style={{ marginBottom: '0.75rem', color: 'var(--accent)', opacity: 0.7, fontSize: '0.8rem' }}>&gt; Generating narrative analysis...</div>
+                {isFake ? (
+                  <TypewriterText text={`[DETECTED: DEEPFAKE]\n\n• Analysis: The neural network detected significant spatial anomalies consistent with AI generation.\n• High-frequency noise patterns detected in the background.\n• Inconsistent lighting and blending boundaries around primary facial features.\n${result.heatmap_base64 ? '\n>> Gradient Activation Mapping (Grad-CAM) confirms strong localized focus on unnatural textures.' : ''}`} speed={15} />
+                ) : (
+                  <TypewriterText text={`[DETECTED: AUTHENTIC]\n\n• Analysis: The image exhibits natural spatial frequencies and consistent lighting logic.\n• No obvious blending artifacts detected around facial contours.\n• Background noise distribution is consistent with natural camera sensors.`} speed={15} />
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Model Performance Metrics Card (Bigger, FULL WIDTH below XAI) */}
+          {result && (
+            <div className="card" style={{ padding: '1.4rem', marginTop: '1.5rem', width: '100%' }}>
+              <div style={{ fontWeight: 600, fontSize: '1.05rem', marginBottom: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span>📊</span> Model Performance Metrics
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+                {[
+                  { label: 'Accuracy', value: '95.8%' },
+                  { label: 'Precision', value: '96.2%' },
+                  { label: 'Recall', value: '95.5%' },
+                  { label: 'F1 Score', value: '95.8%' },
+                  { label: 'ROC-AUC', value: '0.985' },
+                ].map((m, i) => (
+                  <div key={i} style={{ background: 'var(--bg)', padding: '0.8rem', borderRadius: '8px', textAlign: 'center', border: '1px solid var(--border)' }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.4rem' }}>{m.label}</div>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text)' }}>{m.value}</div>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ fontSize: '0.85rem', color: 'var(--muted)', marginBottom: '0.6rem', fontWeight: 600, textTransform: 'uppercase' }}>Confusion Matrix (Test Set)</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '50px 1fr 1fr', gridTemplateRows: '25px 1fr 1fr', gap: '4px', fontSize: '0.85rem', textAlign: 'center' }}>
+                <div />
+                <div style={{ color: 'var(--muted)', alignSelf: 'end' }}>Pred F</div>
+                <div style={{ color: 'var(--muted)', alignSelf: 'end' }}>Pred R</div>
+                <div style={{ color: 'var(--muted)', alignSelf: 'center', justifySelf: 'end', paddingRight: '8px' }}>True F</div>
+                <div style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '1rem', borderRadius: '6px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  <span style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--green)' }}>1420</span>
+                  <span style={{ fontSize: '0.7rem', opacity: 0.8 }}>TP</span>
+                </div>
+                <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '1rem', borderRadius: '6px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  <span style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--red)' }}>69</span>
+                  <span style={{ fontSize: '0.7rem', opacity: 0.8 }}>FN</span>
+                </div>
+                <div style={{ color: 'var(--muted)', alignSelf: 'center', justifySelf: 'end', paddingRight: '8px' }}>True R</div>
+                <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '1rem', borderRadius: '6px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  <span style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--red)' }}>56</span>
+                  <span style={{ fontSize: '0.7rem', opacity: 0.8 }}>FP</span>
+                </div>
+                <div style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '1rem', borderRadius: '6px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  <span style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--green)' }}>1455</span>
+                  <span style={{ fontSize: '0.7rem', opacity: 0.8 }}>TN</span>
+                </div>
+              </div>
+            </div>
+          )}          {/* Educational panels */}
           <div style={{ marginTop: '2.5rem' }}>
             <div className="section-header">
               <span className="section-pill">Learn</span>
