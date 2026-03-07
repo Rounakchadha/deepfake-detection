@@ -382,6 +382,54 @@ export default function Detect() {
                   Highlighted regions show where the neural network focused when making its decision.
                 </div>
               )}
+
+              {/* Model Performance Metrics Card (Moved to Left Column) */}
+              {result && (
+                <div className="card" style={{ padding: '1.2rem', marginTop: '1rem' }}>
+                  <div style={{ fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <span>📊</span> Model Performance Metrics
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginBottom: '1rem' }}>
+                    {[
+                      { label: 'Accuracy', value: '95.8%' },
+                      { label: 'Precision', value: '96.2%' },
+                      { label: 'Recall', value: '95.5%' },
+                      { label: 'F1 Score', value: '95.8%' },
+                      { label: 'ROC-AUC', value: '0.985' },
+                    ].map((m, i) => (
+                      <div key={i} style={{ background: 'var(--bg)', padding: '0.5rem', borderRadius: '6px', textAlign: 'center', border: '1px solid var(--border)' }}>
+                        <div style={{ fontSize: '0.65rem', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{m.label}</div>
+                        <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text)' }}>{m.value}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div style={{ fontSize: '0.75rem', color: 'var(--muted)', marginBottom: '0.4rem', fontWeight: 600, textTransform: 'uppercase' }}>Confusion Matrix (Test Set)</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '40px 1fr 1fr', gridTemplateRows: '20px 1fr 1fr', gap: '2px', fontSize: '0.75rem', textAlign: 'center' }}>
+                    <div />
+                    <div style={{ color: 'var(--muted)', alignSelf: 'end' }}>Pred F</div>
+                    <div style={{ color: 'var(--muted)', alignSelf: 'end' }}>Pred R</div>
+                    <div style={{ color: 'var(--muted)', alignSelf: 'center', justifySelf: 'end', paddingRight: '4px' }}>True F</div>
+                    <div style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '0.5rem', borderRadius: '4px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                      <span style={{ fontWeight: 600, color: 'var(--green)' }}>1420</span>
+                      <span style={{ fontSize: '0.6rem', opacity: 0.7 }}>TP</span>
+                    </div>
+                    <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '0.5rem', borderRadius: '4px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                      <span style={{ fontWeight: 600, color: 'var(--red)' }}>69</span>
+                      <span style={{ fontSize: '0.6rem', opacity: 0.7 }}>FN</span>
+                    </div>
+                    <div style={{ color: 'var(--muted)', alignSelf: 'center', justifySelf: 'end', paddingRight: '4px' }}>True R</div>
+                    <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '0.5rem', borderRadius: '4px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                      <span style={{ fontWeight: 600, color: 'var(--red)' }}>56</span>
+                      <span style={{ fontSize: '0.6rem', opacity: 0.7 }}>FP</span>
+                    </div>
+                    <div style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '0.5rem', borderRadius: '4px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                      <span style={{ fontWeight: 600, color: 'var(--green)' }}>1455</span>
+                      <span style={{ fontSize: '0.6rem', opacity: 0.7 }}>TN</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -426,51 +474,6 @@ export default function Detect() {
                     </div>
                   </div>
 
-                  {/* Model Performance Metrics Card */}
-                  <div className="card" style={{ padding: '1.2rem' }}>
-                    <div style={{ fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                      <span>📊</span> Model Performance Metrics
-                    </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginBottom: '1rem' }}>
-                      {[
-                        { label: 'Accuracy', value: '95.8%' },
-                        { label: 'Precision', value: '96.2%' },
-                        { label: 'Recall', value: '95.5%' },
-                        { label: 'F1 Score', value: '95.8%' },
-                        { label: 'ROC-AUC', value: '0.985' },
-                      ].map((m, i) => (
-                        <div key={i} style={{ background: 'var(--bg)', padding: '0.5rem', borderRadius: '6px', textAlign: 'center', border: '1px solid var(--border)' }}>
-                          <div style={{ fontSize: '0.65rem', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{m.label}</div>
-                          <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text)' }}>{m.value}</div>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div style={{ fontSize: '0.75rem', color: 'var(--muted)', marginBottom: '0.4rem', fontWeight: 600, textTransform: 'uppercase' }}>Confusion Matrix (Test Set)</div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '40px 1fr 1fr', gridTemplateRows: '20px 1fr 1fr', gap: '2px', fontSize: '0.75rem', textAlign: 'center' }}>
-                      <div />
-                      <div style={{ color: 'var(--muted)', alignSelf: 'end' }}>Pred F</div>
-                      <div style={{ color: 'var(--muted)', alignSelf: 'end' }}>Pred R</div>
-                      <div style={{ color: 'var(--muted)', alignSelf: 'center', justifySelf: 'end', paddingRight: '4px' }}>True F</div>
-                      <div style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '0.5rem', borderRadius: '4px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                        <span style={{ fontWeight: 600, color: 'var(--green)' }}>1420</span>
-                        <span style={{ fontSize: '0.6rem', opacity: 0.7 }}>TP</span>
-                      </div>
-                      <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '0.5rem', borderRadius: '4px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                        <span style={{ fontWeight: 600, color: 'var(--red)' }}>69</span>
-                        <span style={{ fontSize: '0.6rem', opacity: 0.7 }}>FN</span>
-                      </div>
-                      <div style={{ color: 'var(--muted)', alignSelf: 'center', justifySelf: 'end', paddingRight: '4px' }}>True R</div>
-                      <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '0.5rem', borderRadius: '4px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                        <span style={{ fontWeight: 600, color: 'var(--red)' }}>56</span>
-                        <span style={{ fontSize: '0.6rem', opacity: 0.7 }}>FP</span>
-                      </div>
-                      <div style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '0.5rem', borderRadius: '4px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                        <span style={{ fontWeight: 600, color: 'var(--green)' }}>1455</span>
-                        <span style={{ fontSize: '0.6rem', opacity: 0.7 }}>TN</span>
-                      </div>
-                    </div>
-                  </div>
 
                   {uncertain && (
                     <div className="alert alert-warning">
