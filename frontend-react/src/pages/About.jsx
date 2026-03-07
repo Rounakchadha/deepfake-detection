@@ -20,10 +20,10 @@ const STACK = [
 const NOVEL = [
     { emoji: '🎯', title: 'Confidence-Aware Ensemble', desc: 'First to use a HuggingFace HTTP fallback triggered only when the primary model is uncertain — zero extra RAM.' },
     { emoji: '🗺️', title: 'Interactive Grad-CAM', desc: 'Not just research figures — live, toggleable Grad-CAM overlay in the web UI.' },
-    { emoji: '🎥', title: 'Video Detection', desc: 'Frame-by-frame analysis with temporal ensemble — addressed the old paper\'s explicit future work limitation.' },
+    { emoji: '🎥', title: 'Video Detection', desc: 'Frame-by-frame analysis with temporal ensemble — addressed the old models\' explicit future work limitation.' },
     { emoji: '🌐', title: 'REST API + React Frontend', desc: 'Production deployable — Docker, HuggingFace Spaces, and local — not a Jupyter notebook.' },
     { emoji: '⚡', title: 'Uncertainty Flagging', desc: 'Borderline zone (35–65%) explicitly flagged to recommend human expert review.' },
-    { emoji: '📊', title: 'Cross-Dataset Evaluation', desc: '4 independent test sets vs. the old paper\'s single same-source test split.' },
+    { emoji: '📊', title: 'Cross-Dataset Evaluation', desc: '4 independent test sets vs. the old models\' single same-source test split.' },
 ]
 
 export default function About() {

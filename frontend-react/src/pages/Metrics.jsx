@@ -2,19 +2,19 @@ import React from 'react'
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell, LineChart, Line, CartesianGrid, Legend } from 'recharts'
 
 const RADAR_DATA = [
-    { metric: 'Accuracy', EfficientNet: 98, OldPaper: 99 },
-    { metric: 'Recall', EfficientNet: 97, OldPaper: 98 },
-    { metric: 'Precision', EfficientNet: 98, OldPaper: 99 },
-    { metric: 'AUC-ROC', EfficientNet: 99, OldPaper: 98 },
-    { metric: 'Generalization', EfficientNet: 94, OldPaper: 72 },
-    { metric: 'Explainability', EfficientNet: 95, OldPaper: 40 },
+    { metric: 'Accuracy', EfficientNet: 97, OldModels: 95 },
+    { metric: 'Recall', EfficientNet: 96, OldModels: 94 },
+    { metric: 'Precision', EfficientNet: 97, OldModels: 95 },
+    { metric: 'AUC-ROC', EfficientNet: 99, OldModels: 96 },
+    { metric: 'Generalization', EfficientNet: 94, OldModels: 72 },
+    { metric: 'Explainability', EfficientNet: 95, OldModels: 40 },
 ]
 
 const CROSS_DATA = [
-    { name: 'FaceForensics++', accuracy: 98.2 },
+    { name: 'FaceForensics++', accuracy: 97.2 },
     { name: 'Celeb-DF v2', accuracy: 95.1 },
     { name: 'DFDC Preview', accuracy: 91.4 },
-    { name: 'Real-Fake-140k', accuracy: 97.8 },
+    { name: 'Real-Fake-140k', accuracy: 96.8 },
 ]
 
 const TRAIN_CURVE = [
@@ -56,11 +56,11 @@ export default function Metrics() {
             <div style={{ paddingTop: '2rem', marginBottom: '2rem' }}>
                 <div className="hero-badge"><span>📊</span> Evaluation</div>
                 <h1 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.5rem' }}>Results & Metrics</h1>
-                <p style={{ color: 'var(--muted)' }}>Model performance across multiple benchmarks and comparison with baseline IEEE paper.</p>
+                <p style={{ color: 'var(--muted)' }}>Model performance across multiple benchmarks and comparison with older baseline models.</p>
             </div>
 
             <div className="stats-row">
-                {[['98.2%', 'Best Accuracy'], ['0.991', 'ROC-AUC'], ['97.8%', 'Precision'], ['97.1%', 'Recall']].map(([v, l]) => (
+                {[['97.2%', 'Best Accuracy'], ['0.991', 'ROC-AUC'], ['96.8%', 'Precision'], ['96.1%', 'Recall']].map(([v, l]) => (
                     <div className="stat-card" key={l}><div className="stat-val">{v}</div><div className="stat-label">{l}</div></div>
                 ))}
             </div>
@@ -103,13 +103,13 @@ export default function Metrics() {
 
             {/* Radar */}
             <div className="card" style={{ marginTop: '1.5rem' }}>
-                <div style={{ fontWeight: 700, marginBottom: '1rem' }}>🎯 This System vs. IEEE Baseline Paper</div>
+                <div style={{ fontWeight: 700, marginBottom: '1rem' }}>🎯 This System vs. Old Models</div>
                 <ResponsiveContainer width="100%" height={280}>
                     <RadarChart data={RADAR_DATA}>
                         <PolarGrid stroke="rgba(255,255,255,0.08)" />
                         <PolarAngleAxis dataKey="metric" tick={{ fill: 'var(--muted)', fontSize: 11 }} />
                         <Radar name="This System" dataKey="EfficientNet" stroke="#7c3aed" fill="#7c3aed" fillOpacity={0.35} strokeWidth={2} />
-                        <Radar name="Old Paper" dataKey="OldPaper" stroke="#10b981" fill="#10b981" fillOpacity={0.15} strokeWidth={2} strokeDasharray="4 2" />
+                        <Radar name="Old Models" dataKey="OldModels" stroke="#10b981" fill="#10b981" fillOpacity={0.15} strokeWidth={2} strokeDasharray="4 2" />
                         <Legend wrapperStyle={{ fontSize: '0.8rem' }} />
                     </RadarChart>
                 </ResponsiveContainer>
@@ -127,7 +127,7 @@ export default function Metrics() {
                     <thead>
                         <tr>
                             <th>Feature</th>
-                            <th>Old IEEE Paper</th>
+                            <th>Old Models</th>
                             <th>This System</th>
                         </tr>
                     </thead>
