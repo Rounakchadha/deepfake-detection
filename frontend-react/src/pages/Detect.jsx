@@ -233,6 +233,10 @@ export default function Detect() {
       if (file.type && file.type.startsWith('video')) {
         mock.frames_analyzed = 10
         setResult(mock)
+        generateDemoHeatmap("mock-video-seed").then(hm => {
+          // Mock 3 different frames
+          setResult(prev => prev ? { ...prev, heatmap_samples: [hm.heatmap_base64, hm.heatmap_base64, hm.heatmap_base64] } : prev)
+        })
       } else {
         setResult(mock)
         if (preview?.url) {
@@ -356,7 +360,21 @@ export default function Detect() {
                   style={{ width: '100%', borderRadius: 'var(--radius)', border: '1px solid var(--border)', display: 'block' }}
                 />
               ) : (
-                <video src={preview.url} controls style={{ width: '100%', borderRadius: 'var(--radius)', border: '1px solid var(--border)' }} />
+                <div>
+                  <video src={preview.url} controls style={{ width: '100%', borderRadius: 'var(--radius)', border: '1px solid var(--border)', display: 'block' }} />
+                  {result?.heatmap_samples && result.heatmap_samples.length > 0 && (
+                    <div style={{ marginTop: '1.25rem' }}>
+                      <div style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--muted)', marginBottom: '0.75rem' }}>Extracted Frame Grad-CAMs</div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
+                        {result.heatmap_samples.map((hm, i) => (
+                          <div key={i} style={{ position: 'relative' }}>
+                            <img src={`data:image/jpeg;base64,${hm}`} alt={`Frame ${i + 1}`} style={{ width: '100%', borderRadius: '0.5rem', border: '1px solid var(--border)', display: 'block' }} />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               )}
 
               {hasHeatmap && view !== 'original' && (
