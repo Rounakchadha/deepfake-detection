@@ -26,6 +26,7 @@ import os
 import time
 import requests
 import logging
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -77,7 +78,7 @@ class HuggingFaceEnsemble:
         except Exception:
             return False
 
-    def query_image_bytes(self, image_bytes: bytes) -> dict | None:
+    def query_image_bytes(self, image_bytes: bytes) -> Optional[dict]:
         """
         Send raw image bytes to HF Inference API.
 
@@ -127,7 +128,7 @@ class HuggingFaceEnsemble:
             logger.warning(f"HF Inference API error: {e}")
             return None
 
-    def _parse_fake_probability(self, results) -> float | None:
+    def _parse_fake_probability(self, results) -> Optional[float]:
         """
         Map HF classifier labels to a [0, 1] fake probability.
         prithivMLmods/Deep-Fake-Detector-v2-Model uses:

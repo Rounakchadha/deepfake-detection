@@ -301,12 +301,16 @@ export default function Detect() {
   const fakeProb = result ? Math.round((result.fake_probability ?? result.confidence ?? 0) * 100) : 0
   const uncertain = result && fakeProb >= 35 && fakeProb <= 65
   const hasHeatmap = result?.heatmap_base64 || result?.heatmap_only_base64
+  const hasAttention = !!result?.attention_map_base64
+  const hasFft = !!result?.fft_heatmap_base64
 
   const getDisplayImage = () => {
     if (preview?.type !== 'image') return null
     if (view === 'original') return preview.url
     if (view === 'heatmap') return result?.heatmap_only_base64 ? `data:image/jpeg;base64,${result.heatmap_only_base64}` : (result?.heatmap_base64 ? `data:image/jpeg;base64,${result.heatmap_base64}` : preview.url)
     if (view === 'overlay' && result?.heatmap_base64) return `data:image/jpeg;base64,${result.heatmap_base64}`
+    if (view === 'attention' && result?.attention_map_base64) return `data:image/jpeg;base64,${result.attention_map_base64}`
+    if (view === 'fft' && result?.fft_heatmap_base64) return `data:image/jpeg;base64,${result.fft_heatmap_base64}`
     return preview.url
   }
 
@@ -367,11 +371,13 @@ export default function Detect() {
                 <button className="btn btn-ghost" style={{ padding: '0.3rem 0.8rem', fontSize: '0.8rem' }} onClick={onReset}>✕ Reset</button>
               </div>
 
-              {hasHeatmap && preview?.type === 'image' && (
+              {(hasHeatmap || hasAttention || hasFft) && preview?.type === 'image' && (
                 <div className="img-toggle">
                   <button className={`toggle-btn${view === 'original' ? ' active' : ''}`} onClick={() => setView('original')}>Original</button>
-                  {result?.heatmap_only_base64 && <button className={`toggle-btn${view === 'heatmap' ? ' active' : ''}`} onClick={() => setView('heatmap')}>Heatmap</button>}
+                  {result?.heatmap_only_base64 && <button className={`toggle-btn${view === 'heatmap' ? ' active' : ''}`} onClick={() => setView('heatmap')}>Grad-CAM</button>}
                   {result?.heatmap_base64 && <button className={`toggle-btn${view === 'overlay' ? ' active' : ''}`} onClick={() => setView('overlay')}>Overlay</button>}
+                  {hasAttention && <button className={`toggle-btn${view === 'attention' ? ' active' : ''}`} onClick={() => setView('attention')}>Attention</button>}
+                  {hasFft && <button className={`toggle-btn${view === 'fft' ? ' active' : ''}`} onClick={() => setView('fft')}>FFT</button>}
                 </div>
               )}
 
@@ -399,9 +405,12 @@ export default function Detect() {
                 </div>
               )}
 
-              {hasHeatmap && view !== 'original' && (
+              {view !== 'original' && (hasHeatmap || hasAttention || hasFft) && (
                 <div className="alert alert-info" style={{ marginTop: '0.75rem', fontSize: '0.8rem' }}>
-                  Highlighted regions show where the neural network focused when making its decision.
+                  {view === 'heatmap' && 'Grad-CAM: Regions the EfficientNet model found suspicious (warm = high activation).'}
+                  {view === 'overlay' && 'Grad-CAM overlaid on original — warm regions indicate deepfake artifacts.'}
+                  {view === 'attention' && 'ViT Attention Rollout: patches the Vision Transformer attended to when classifying. Bright = high attention.'}
+                  {view === 'fft' && 'FFT Frequency Spectrum: GAN-generated images show characteristic periodic peaks in high-frequency bands (outer ring).'}
                 </div>
               )}
 
@@ -457,16 +466,30 @@ export default function Detect() {
                     </div>
                   )}
 
-                  {result.ensemble_used && (
-                    <div className="alert alert-info">🤗 {result.ensemble_note}</div>
+                  {result.ensemble_used && result.ensemble_note && (
+                    <div className="alert alert-info" style={{fontSize:'0.82rem', opacity: 0.8}}>
+                      📊 {result.ensemble_note}
+                    </div>
                   )}
 
                   <div className="card" style={{ fontSize: '0.82rem', padding: '0.8rem 1rem' }}>
                     <div style={{ fontWeight: 600, marginBottom: '0.5rem' }}>📋 Details</div>
                     <table>
                       <tbody>
-                        {[['Prediction', result.prediction], ['Confidence', `${conf}%`], ['Fake Probability', `${fakeProb}%`], ['Grad-CAM', hasHeatmap ? 'Available' : 'Not available'], ...(result.frames_analyzed ? [['Frames', result.frames_analyzed]] : [])].map(([k, v]) => (
-                          <tr key={k}><td style={{ color: 'var(--muted)', width: '45%' }}>{k}</td><td style={{ fontWeight: 500 }}>{v}</td></tr>
+                        {[
+                          ['Prediction', result.prediction],
+                          ['Confidence', `${conf}%`],
+                          ['Fake Probability', `${fakeProb}%`],
+                          ['Grad-CAM', hasHeatmap ? '✓ Available' : '—'],
+                          ['Attention Map', hasAttention ? '✓ Available' : '—'],
+                          ['FFT Analysis', hasFft ? '✓ Available' : '—'],
+                          ...(result.fft_high_freq_ratio != null ? [['HF Energy Ratio', `${Math.round(result.fft_high_freq_ratio * 100)}%`]] : []),
+                          ...(result.fft_spectral_peak_score != null ? [['Spectral Peak Score', result.fft_spectral_peak_score.toFixed(2)]] : []),
+                          ...(result.mc_mean_prob != null ? [['MC Uncertainty (σ)', `±${Math.round((result.mc_std_prob ?? 0) * 100)}%`]] : []),
+                          ...(result.mc_ci_lower != null ? [['95% Conf. Interval', `${Math.round(result.mc_ci_lower * 100)}%–${Math.round(result.mc_ci_upper * 100)}% fake`]] : []),
+                          ...(result.frames_analyzed ? [['Frames Analysed', result.frames_analyzed]] : []),
+                        ].map(([k, v]) => (
+                          <tr key={k}><td style={{ color: 'var(--muted)', width: '55%' }}>{k}</td><td style={{ fontWeight: 500 }}>{v}</td></tr>
                         ))}
                       </tbody>
                     </table>
@@ -510,9 +533,47 @@ export default function Detect() {
               }}>
                 <div style={{ marginBottom: '0.75rem', color: 'var(--accent)', opacity: 0.7, fontSize: '0.8rem' }}>&gt; Generating narrative analysis...</div>
                 {isFake ? (
-                  <TypewriterText text={`[DETECTED: DEEPFAKE]\n\n• Analysis: The neural network detected significant spatial anomalies consistent with AI generation.\n• High-frequency noise patterns detected in the background.\n• Inconsistent lighting and blending boundaries around primary facial features.\n${result.heatmap_base64 ? '\n>> Gradient Activation Mapping (Grad-CAM) confirms strong localized focus on unnatural textures.' : ''}`} speed={15} />
+                  <TypewriterText text={[
+                    '[DETECTED: DEEPFAKE]',
+                    '',
+                    // Only show Vision AI reason if it actually agrees the image is fake
+                    (result.vision_reason && result.fake_probability >= 0.7)
+                      ? `• Vision AI: ${result.vision_reason}`
+                      : null,
+                    result.hf_result?.fake_probability > 0.5
+                      ? `• Face manipulation detector: ${Math.round(result.hf_result.fake_probability * 100)}% confidence — facial structure shows signs of GAN generation or face swap.`
+                      : null,
+                    result.ai_generated_probability > 0.7
+                      ? `• AI image detector: ${Math.round(result.ai_generated_probability * 100)}% — pixel-level patterns match synthetic generation (Midjourney/SD/DALL-E/StyleGAN).`
+                      : null,
+                    (!result.vision_reason || result.fake_probability < 0.7)
+                      ? '• Neural network detected subtle spatial anomalies inconsistent with real photography.'
+                      : null,
+                    result.fft_high_freq_ratio !== null
+                      ? `• FFT frequency analysis: ratio ${result.fft_high_freq_ratio?.toFixed(4)} — spectral fingerprints indicate digital manipulation.`
+                      : null,
+                    result.heatmap_base64
+                      ? '\n>> Grad-CAM map highlights the exact regions that triggered detection.'
+                      : null,
+                  ].filter(Boolean).join('\n')} speed={15} />
                 ) : (
-                  <TypewriterText text={`[DETECTED: AUTHENTIC]\n\n• Analysis: The image exhibits natural spatial frequencies and consistent lighting logic.\n• No obvious blending artifacts detected around facial contours.\n• Background noise distribution is consistent with natural camera sensors.`} speed={15} />
+                  <TypewriterText text={[
+                    '[DETECTED: AUTHENTIC]',
+                    '',
+                    // Only show Vision AI reason when it agrees image is real (low fake_prob)
+                    (result.vision_reason && result.fake_probability < 0.3)
+                      ? `• Vision AI: ${result.vision_reason}`
+                      : '• No contextual manipulation detected — image scene is plausible.',
+                    result.hf_result?.fake_probability < 0.3
+                      ? `• Face detector: ${Math.round((1 - result.hf_result.fake_probability) * 100)}% confidence — no face manipulation or GAN artifacts found.`
+                      : null,
+                    result.ai_generated_probability != null && result.ai_generated_probability < 0.3
+                      ? `• AI image detector: ${Math.round((1 - result.ai_generated_probability) * 100)}% real — pixel distribution matches genuine camera output.`
+                      : null,
+                    result.fft_high_freq_ratio !== null
+                      ? `• FFT analysis: frequency ratio ${result.fft_high_freq_ratio?.toFixed(4)} — noise distribution consistent with natural camera sensor.`
+                      : null,
+                  ].filter(Boolean).join('\n')} speed={15} />
                 )}
               </div>
             </div>

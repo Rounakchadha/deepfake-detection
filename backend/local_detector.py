@@ -1,14 +1,11 @@
 """
 local_detector.py — Local ViT Deepfake Detector
 =================================================
-Uses 'prithivMLmods/Deep-Fake-Detector-v2-Model': a ViT fine-tuned specifically
-for deepfake face detection. Labels: {0: 'Realism', 1: 'Deepfake'}.
-
-IMPORTANT: The model was trained on FACE-CROPPED images.
-We extract the face first before feeding to ViT to match training distribution.
+Uses 'dima806/deepfake_vs_real_image_detection': a ViT fine-tuned on real vs
+deepfake/GAN-generated images. Labels: {0: 'Real', 1: 'Fake'}.
+Handles both face-swap deepfakes and GAN-generated portrait faces.
 """
 
-import io
 import logging
 import cv2
 import numpy as np
@@ -17,7 +14,7 @@ from PIL import Image
 
 logger = logging.getLogger(__name__)
 
-MODEL_ID = "prithivMLmods/Deep-Fake-Detector-v2-Model"
+MODEL_ID = "dima806/deepfake_vs_real_image_detection"
 _model_cache = {}
 
 
@@ -75,10 +72,15 @@ def _load_model(device=None):
     logger.info(f"Loading local deepfake detector: {MODEL_ID}")
 
     try:
+        import os
         from transformers import ViTForImageClassification, ViTImageProcessor
 
+        # Use system HF cache (~/.cache/huggingface) — already populated after first run
         processor = ViTImageProcessor.from_pretrained(MODEL_ID)
-        model = ViTForImageClassification.from_pretrained(MODEL_ID)
+        # eager attention implementation is required for output_attentions=True
+        model = ViTForImageClassification.from_pretrained(
+            MODEL_ID, attn_implementation="eager", low_cpu_mem_usage=False
+        )
 
         if device is None:
             if torch.cuda.is_available():
@@ -103,21 +105,31 @@ def _load_model(device=None):
         return None, None, None
 
 
-def predict_local(image_bytes: bytes):
+def warmup():
+    """Eagerly load the ViT model at startup so first inference is instant."""
+    logger.info("Pre-loading ViT deepfake detector...")
+    _load_model()
+    logger.info("ViT model ready.")
+
+
+def predict_local(image_bytes: bytes, include_attention: bool = False):
     """
     Run local ViT inference on raw image bytes.
     Crops face first to match training distribution.
-    Returns dict with fake_probability, or None on failure.
+    Returns dict with fake_probability (and optionally attention rollout), or None on failure.
     """
     try:
         model, processor, device = _load_model()
         if model is None:
             return None
 
-        # Extract face crop (model trained on face images, not full photos)
-        face_image = _extract_face_pil(image_bytes)
+        # dima806 model trained on full images (not face-cropped) — pass full image directly
+        # Face extraction was needed for prithivMLmods but hurts accuracy here
+        from PIL import Image as PILImage
+        from io import BytesIO as _BytesIO
+        full_image = PILImage.open(_BytesIO(image_bytes)).convert("RGB")
 
-        inputs = processor(images=face_image, return_tensors="pt")
+        inputs = processor(images=full_image, return_tensors="pt")
         inputs = {k: v.to(device) for k, v in inputs.items()}
 
         with torch.no_grad():
@@ -126,25 +138,41 @@ def predict_local(image_bytes: bytes):
         probs = torch.softmax(outputs.logits, dim=-1)[0]
         id2label = model.config.id2label
 
-        # Find fake class index dynamically
         fake_idx = None
         for idx, lbl in id2label.items():
-            if any(w in lbl.lower() for w in ("fake", "deepfake", "artificial", "generated")):
+            if any(w in lbl.lower() for w in ("fake", "deepfake", "artificial", "generated", "ai")):
                 fake_idx = idx
                 break
         if fake_idx is None:
-            fake_idx = 1  # Default for prithivMLmods: 1=Deepfake
+            fake_idx = 1  # {0: 'Real', 1: 'Fake'} for dima806 model
 
         fake_prob = probs[fake_idx].item()
         all_scores = {id2label[i]: round(probs[i].item(), 4) for i in range(len(probs))}
-        logger.info(f"ViT scores (face-cropped): {all_scores}")
+        logger.info(f"ViT scores: {all_scores}")
 
-        return {
+        # Keep face_image for attention map (still use face crop for visualization)
+        face_image = _extract_face_pil(image_bytes)
+
+        result = {
             "fake_probability": round(fake_prob, 4),
             "source": "local_vit",
             "model": MODEL_ID,
             "all_scores": all_scores,
         }
+
+        if include_attention:
+            from backend.attention_map import compute_attention_rollout
+            # MPS doesn't support output_attentions well — fall back to CPU for attention
+            attn_device = torch.device("cpu")
+            model_cpu = model.to(attn_device) if str(device) == "mps" else model
+            result["attention_map_base64"] = compute_attention_rollout(
+                model_cpu, processor, attn_device, face_image
+            )
+            # Move back to original device if we moved
+            if str(device) == "mps":
+                model.to(device)
+
+        return result
 
     except Exception as e:
         logger.error(f"Local ViT inference error: {e}")

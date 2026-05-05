@@ -23,11 +23,29 @@ detector = None
 
 @app.on_event("startup")
 async def load_detector():
-    """Initializes the heavy PyTorch model once on startup."""
+    """Load EfficientNet synchronously (fast), then warm up ViT in background."""
     global detector
+    import time, threading
+    t0 = time.time()
     print("Initializing Deepfake Detector Pipeline...")
     detector = DeepfakeDetector()
-    print("Pipeline ready.")
+    print(f"EfficientNet ready in {time.time() - t0:.1f}s. Loading ViT in background...")
+
+    def _warmup_models():
+        try:
+            from backend.local_detector import warmup as warmup_vit
+            warmup_vit()
+            print("ViT face deepfake detector ready.")
+        except Exception as e:
+            print(f"ViT background load failed: {e}")
+        try:
+            from backend.ai_image_detector import warmup as warmup_ai
+            warmup_ai()
+            print("General AI image detector ready (DALL-E/SD/Midjourney detection active).")
+        except Exception as e:
+            print(f"AI image detector load failed: {e}")
+
+    threading.Thread(target=_warmup_models, daemon=True).start()
 
 @app.get("/")
 def read_root():
@@ -36,7 +54,7 @@ def read_root():
 @app.post("/predict/image")
 async def predict_image_endpoint(file: UploadFile = File(...)):
     """Accepts an image and returns REAL/FAKE prediction + Grad-CAM heatmap."""
-    if not file.content_type.startswith('image/'):
+    if file.content_type and not file.content_type.startswith('image/'):
         raise HTTPException(status_code=400, detail="File must be an image.")
         
     try:
@@ -50,7 +68,7 @@ async def predict_image_endpoint(file: UploadFile = File(...)):
 @app.post("/predict/video")
 async def predict_video_endpoint(file: UploadFile = File(...)):
     """Accepts a video, processes sampled frames, and returns a cumulative prediction."""
-    if not file.content_type.startswith('video/'):
+    if file.content_type and not file.content_type.startswith('video/'):
         raise HTTPException(status_code=400, detail="File must be a video.")
         
     try:

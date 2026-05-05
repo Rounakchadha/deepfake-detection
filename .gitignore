@@ -130,3 +130,15 @@ DFDC/
 
 # ignore notebook temporary files
 .ipynb_checkpoints/
+
+# Sensitive credentials
+kaggle.json/
+kaggle.json
+
+# Logs
+backend.log
+frontend.log
+*.log
+
+# HuggingFace cache
+.hf_cache/

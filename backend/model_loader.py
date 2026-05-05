@@ -36,7 +36,27 @@ def load_model(device=None):
         print(f"Loading weights from {weight_path} onto {device}...")
         try:
             state_dict = torch.load(weight_path, map_location=device)
-            model.load_state_dict(state_dict)
+            # If checkpoint has raw EfficientNet keys (no base_model. prefix),
+            # the checkpoint was saved by train.py directly — rebuild matching arch.
+            if any(k.startswith("features.") for k in state_dict):
+                from torchvision import models as tvm
+                import torch.nn as _nn
+                raw = tvm.efficientnet_b0(weights=None)
+                in_f = raw.classifier[1].in_features
+                raw.classifier = _nn.Sequential(
+                    _nn.Dropout(0.4),
+                    _nn.Linear(in_f, 256),
+                    _nn.ReLU(),
+                    _nn.Dropout(0.3),
+                    _nn.Linear(256, 1),
+                )
+                raw.load_state_dict(state_dict)
+                raw.to(device).eval()
+                print("  Loaded raw EfficientNet checkpoint (train.py format).")
+                return raw, device
+            else:
+                model.load_state_dict(state_dict)
+                print("  Loaded TransferDeepfakeModel checkpoint.")
         except Exception as e:
             print(f"Failed to load weights: {e}")
             print("Running with architecture-only weights (untrained).")
