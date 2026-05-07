@@ -51,7 +51,7 @@ async def load_detector():
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok"}
+    return {"status": "ok", "models_ready": detector is not None}
 
 @app.get("/")
 def read_root():
@@ -59,10 +59,10 @@ def read_root():
 
 @app.post("/predict/image")
 async def predict_image_endpoint(file: UploadFile = File(...)):
-    """Accepts an image and returns REAL/FAKE prediction + Grad-CAM heatmap."""
+    if detector is None:
+        raise HTTPException(status_code=503, detail="Models are still loading, please wait 20-30 seconds and try again.")
     if file.content_type and not file.content_type.startswith('image/'):
         raise HTTPException(status_code=400, detail="File must be an image.")
-        
     try:
         contents = await file.read()
         response = detector.predict_image(contents)
@@ -73,13 +73,12 @@ async def predict_image_endpoint(file: UploadFile = File(...)):
 
 @app.post("/predict/video")
 async def predict_video_endpoint(file: UploadFile = File(...)):
-    """Accepts a video, processes sampled frames, and returns a cumulative prediction."""
+    if detector is None:
+        raise HTTPException(status_code=503, detail="Models are still loading, please wait 20-30 seconds and try again.")
     if file.content_type and not file.content_type.startswith('video/'):
         raise HTTPException(status_code=400, detail="File must be a video.")
-        
     try:
         contents = await file.read()
-        # Takes longer, we'll wait for it.
         response = detector.predict_video(contents, sample_every_n_frames=30)
         return response
     except Exception as e:
