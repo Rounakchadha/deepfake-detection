@@ -116,6 +116,7 @@ frontend-react/node_modules/
 
 # data
 data/
+!frontend-react/src/data/
 datasets/
 FaceForensics++/
 Celeb-DF/
