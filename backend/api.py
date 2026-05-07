@@ -1,6 +1,5 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from backend.inference import DeepfakeDetector
 import uvicorn
 
 app = FastAPI(
@@ -30,6 +29,7 @@ async def load_detector():
         global detector
         try:
             print("Initializing Deepfake Detector Pipeline...")
+            from backend.inference import DeepfakeDetector
             detector = DeepfakeDetector()
             print("EfficientNet ready.")
         except Exception as e:

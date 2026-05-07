@@ -25,8 +25,5 @@ COPY . /app/
 # Make port 8000 available to the world outside this container for FastAPI
 # Make port 8501 available for Streamlit
 EXPOSE 8000
-EXPOSE 8501
 
-# Default command: We can override this to run FastAPI or Streamlit
-# By default, let's run the backend API
-CMD ["uvicorn", "backend.api:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD uvicorn backend.api:app --host 0.0.0.0 --port ${PORT:-8000}
