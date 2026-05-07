@@ -23,15 +23,17 @@ detector = None
 
 @app.on_event("startup")
 async def load_detector():
-    """Load EfficientNet synchronously (fast), then warm up ViT in background."""
-    global detector
-    import time, threading
-    t0 = time.time()
-    print("Initializing Deepfake Detector Pipeline...")
-    detector = DeepfakeDetector()
-    print(f"EfficientNet ready in {time.time() - t0:.1f}s. Loading ViT in background...")
+    """Load all models in background so healthcheck passes immediately."""
+    import threading
 
-    def _warmup_models():
+    def _load_all():
+        global detector
+        try:
+            print("Initializing Deepfake Detector Pipeline...")
+            detector = DeepfakeDetector()
+            print("EfficientNet ready.")
+        except Exception as e:
+            print(f"Detector init failed: {e}")
         try:
             from backend.local_detector import warmup as warmup_vit
             warmup_vit()
@@ -41,11 +43,15 @@ async def load_detector():
         try:
             from backend.ai_image_detector import warmup as warmup_ai
             warmup_ai()
-            print("General AI image detector ready (DALL-E/SD/Midjourney detection active).")
+            print("General AI image detector ready.")
         except Exception as e:
             print(f"AI image detector load failed: {e}")
 
-    threading.Thread(target=_warmup_models, daemon=True).start()
+    threading.Thread(target=_load_all, daemon=True).start()
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
 
 @app.get("/")
 def read_root():
