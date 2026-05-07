@@ -1,0 +1,12 @@
+[phases.setup]
+nixPkgs = ["python310", "libGL", "libGLU", "glib"]
+
+[phases.install]
+cmds = [
+  "pip install --upgrade pip",
+  "pip install torch==2.2.0+cpu torchvision==0.17.0+cpu --index-url https://download.pytorch.org/whl/cpu",
+  "pip install -r requirements.txt --ignore-installed torch torchvision"
+]
+
+[start]
+cmd = "uvicorn backend.api:app --host 0.0.0.0 --port $PORT"

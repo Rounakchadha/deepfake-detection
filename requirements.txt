@@ -1,10 +1,9 @@
 fastapi==0.109.2
 uvicorn==0.27.1
 pydantic==2.6.1
-streamlit==1.31.0
-torch==2.2.0
-torchvision==0.17.0
-torchaudio==2.2.0
+pydantic-settings
+torch==2.2.0+cpu
+torchvision==0.17.0+cpu
 numpy==1.26.4
 pandas==2.2.0
 matplotlib==3.8.2
@@ -18,5 +17,8 @@ Pillow==10.2.0
 tqdm==4.66.2
 timm==0.9.12
 grad-cam==1.5.0
+transformers
+accelerate
+groq
 onnx==1.15.0
 onnxruntime==1.17.0
