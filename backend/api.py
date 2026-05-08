@@ -27,6 +27,7 @@ async def load_detector():
 
     def _load_all():
         global detector
+        import traceback
         try:
             print("Initializing Deepfake Detector Pipeline...")
             from backend.inference import DeepfakeDetector
@@ -34,18 +35,22 @@ async def load_detector():
             print("EfficientNet ready.")
         except Exception as e:
             print(f"Detector init failed: {e}")
+            traceback.print_exc()
+            return
         try:
             from backend.local_detector import warmup as warmup_vit
             warmup_vit()
             print("ViT face deepfake detector ready.")
         except Exception as e:
             print(f"ViT background load failed: {e}")
+            traceback.print_exc()
         try:
             from backend.ai_image_detector import warmup as warmup_ai
             warmup_ai()
             print("General AI image detector ready.")
         except Exception as e:
             print(f"AI image detector load failed: {e}")
+            traceback.print_exc()
 
     threading.Thread(target=_load_all, daemon=True).start()
 
